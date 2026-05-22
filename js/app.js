@@ -175,7 +175,7 @@ ${spreadList}`
             <span class="logo-dot purple"></span>
           </div>
           <h1>又来算了</h1>
-          <p class="subtitle">听听内心的声音，找到前进的方向</p>
+          <p class="subtitle">好的信，坏的不信</p>
         </div>
         <div class="recommend-section">
           <div class="recommend-input-row">
