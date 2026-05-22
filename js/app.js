@@ -43,6 +43,16 @@ const App = {
     return posName.replace(/选择A/g, this.decisionLabels.a).replace(/选择B/g, this.decisionLabels.b);
   },
 
+  showToast(msg) {
+    const existing = document.querySelector(".toast");
+    if (existing) existing.remove();
+    const el = document.createElement("div");
+    el.className = "toast";
+    el.textContent = msg;
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 2200);
+  },
+
   detectQuestionType(question) {
     const q = question.replace(/[？?！!。，,.]/g, "");
     if (/什么时候|多久|几时|何时|多久能|什么时候能|什么时候会/.test(q)) return "timing";
@@ -269,6 +279,14 @@ ${spreadList}`
         this.reader.useReversals = document.getElementById("reversalCheck").checked;
         this.showScreen("question");
       });
+    });
+
+    document.getElementById("reversalCheck")?.addEventListener("change", (e) => {
+      if (e.target.checked) {
+        this.showToast("已启用逆位 — 牌可能出现倒置，解读更丰富");
+      } else {
+        this.showToast("已关闭逆位 — 所有牌只出现正位，解读更积极");
+      }
     });
   },
 
