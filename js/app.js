@@ -476,6 +476,8 @@ ${spreadList}`
 
   bindSlotEvents() {
     const self = this;
+    if (this._slotsBound) return;
+    this._slotsBound = true;
     let longPressTimer = null;
     let isDragging = false;
     let dragSlotIndex = null;
@@ -572,7 +574,8 @@ ${spreadList}`
     });
 
     const revealBtn = document.getElementById("revealBtn");
-    if (revealBtn) {
+    if (revealBtn && !revealBtn._bound) {
+      revealBtn._bound = true;
       revealBtn.addEventListener("click", () => this.startReveal());
     }
   },
