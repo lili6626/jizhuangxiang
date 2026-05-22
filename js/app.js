@@ -174,7 +174,7 @@ ${spreadList}`
             <span class="logo-dot green"></span>
             <span class="logo-dot purple"></span>
           </div>
-          <h1>塔罗占卜</h1>
+          <h1>又来算了</h1>
           <p class="subtitle">听听内心的声音，找到前进的方向</p>
         </div>
         <div class="recommend-section">
@@ -302,6 +302,7 @@ ${spreadList}`
   },
 
   renderDraw() {
+    this._slotsBound = false;
     const app = document.getElementById("app");
     const spread = this.reader.currentSpread;
     const filledCount = this.selectedSlots.filter(s => s !== null).length;
