@@ -101,11 +101,17 @@ const App = {
     const q = question.toLowerCase();
     const hasSpecificPartner = /他|她|我们|前任|对象|伴侣|老公|老婆|男朋友|女朋友/.test(q);
     const isTimelineQuestion = /什么时候|多久|几时|何时|多久能|什么时候能/.test(q);
+    const loveKeywords = ["分手", "复合", "暧昧", "暗恋", "表白", "在一起"];
+    const hasLoveKeyword = loveKeywords.some(kw => q.includes(kw));
+    const isTrivialYesNo = !hasLoveKeyword && /要不要(吃|买|去|看|做|玩|喝|穿|用|带|拿|给|说|问|发|回|叫|找|换|改|删|加|开|关|停|试|等|搬|养|剪|种|修|学|考|选|报|订|约|送|接|陪|帮|请|让|追|聊)/.test(q) && !/工作|辞职|离职|创业|转行|考研|留学|出国|买房|投资|跳槽/.test(q);
+    const isSimpleYesNo = !hasLoveKeyword && !hasSpecificPartner && /^(要不要|该不该|能不能|会不会|是不是|好不好|行不行)\S{0,4}$/.test(q.replace(/[？?！!。，,.]/g, ""));
 
     const rules = [
       { test: () => hasSpecificPartner && !isTimelineQuestion, spread: "relationship", reason: "关于具体的感情关系，关系牌阵能深入分析双方的感受和走向" },
-      { keywords: ["分手", "复合", "暧昧", "暗恋", "表白", "在一起"], spread: "relationship", reason: "关于感情发展的问题，关系牌阵能分析双方的能量和关系走向" },
-      { keywords: ["选", "抉择", "还是", "要不要", "该不该", "是否", "换工作", "留下", "离开"], spread: "decision", reason: "面对二选一的抉择，决策牌阵帮你对比两条路的利弊" },
+      { keywords: loveKeywords, spread: "relationship", reason: "关于感情发展的问题，关系牌阵能分析双方的能量和关系走向" },
+      { test: () => isSimpleYesNo || isTrivialYesNo, spread: "single", reason: "简单的是/否问题，单牌阵给你最直接的答案" },
+      { keywords: ["抉择", "还是", "该不该", "是否"], spread: "decision", reason: "面对二选一的抉择，决策牌阵帮你对比两条路的利弊" },
+      { test: () => /要不要|该不该/.test(q) && /工作|辞职|离职|创业|转行|考研|留学|出国|买房|投资|跳槽/.test(q), spread: "decision", reason: "涉及人生重要抉择，决策牌阵帮你全面分析利弊" },
       { test: () => isTimelineQuestion, spread: "horseshoe", reason: "关于时间线和未来趋势的问题，马蹄牌阵能看清脉络和最终走向" },
       { keywords: ["为什么", "怎么回事", "到底", "背后", "隐藏", "深层", "真相", "原因"], spread: "horseshoe", reason: "想了解事情背后的隐藏因素，马蹄牌阵能揭示你看不到的影响" },
       { keywords: ["一生", "命运", "人生", "整体", "全面", "何去何从", "出路", "迷茫"], spread: "celtic", reason: "涉及人生的深层困惑，凯尔特十字牌阵提供最全面的解读" },
