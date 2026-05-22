@@ -395,24 +395,26 @@ ${spreadList}`
     const area = document.getElementById("drawArea");
     if (!area) return;
     const remaining = this.availableDeck.length;
-    const perRow = window.innerWidth < 500 ? 10 : 13;
-    const totalRows = Math.ceil(remaining / perRow);
     area.innerHTML = "";
 
-    for (let i = 0; i < remaining; i++) {
-      const row = Math.floor(i / perRow);
-      const col = i % perRow;
-      const totalInRow = row < totalRows - 1 ? perRow : remaining - row * perRow;
-      const isTop = col === totalInRow - 1;
-      const rotation = (col - totalInRow / 2) * 1.5 + (Math.random() - 0.5) * 2;
+    const fan = document.createElement("div");
+    fan.className = "deck-fan";
 
+    const maxAngle = 50;
+    const step = remaining > 1 ? (maxAngle * 2) / (remaining - 1) : 0;
+
+    for (let i = 0; i < remaining; i++) {
+      const angle = remaining > 1 ? -maxAngle + step * i : 0;
       const card = document.createElement("div");
-      card.className = "deck-card" + (isTop ? " deck-card-top" : "");
+      card.className = "fan-card";
       card.dataset.deckIndex = i;
-      card.innerHTML = `<div class="deck-card-inner" style="transform:rotate(${rotation}deg)">${this.cardBackSVG}</div>`;
+      card.style.setProperty("--r", angle + "deg");
+      card.innerHTML = `<div class="fan-card-inner">${this.cardBackSVG}</div>`;
       card.addEventListener("click", () => this.selectCard(i));
-      area.appendChild(card);
+      fan.appendChild(card);
     }
+
+    area.appendChild(fan);
   },
 
   selectCard(deckIndex) {
@@ -426,29 +428,40 @@ ${spreadList}`
     this.selectedSlots[emptyIndex] = { card, is_reversed: card.is_reversed };
     this.availableDeck.splice(deckIndex, 1);
 
-    const clickedEl = document.querySelector(`.deck-card[data-deck-index="${deckIndex}"]`);
+    const clickedEl = document.querySelector(`.fan-card[data-deck-index="${deckIndex}"]`);
     const slot = document.querySelector(`.slot-card-area[data-slot="${emptyIndex}"]`);
 
     if (clickedEl && slot) {
       const rect = clickedEl.getBoundingClientRect();
       const slotRect = slot.getBoundingClientRect();
+      const dx = slotRect.left + slotRect.width / 2 - rect.left - rect.width / 2;
+      const dy = slotRect.top + slotRect.height / 2 - rect.top - rect.height / 2;
 
-      // Phase 1: pull up
-      clickedEl.style.transition = "transform 0.2s ease-out, opacity 0.2s ease-out";
-      clickedEl.style.transform = "translateY(-40px)";
-      clickedEl.style.zIndex = "100";
+      const ghost = clickedEl.cloneNode(true);
+      ghost.style.position = "fixed";
+      ghost.style.left = rect.left + "px";
+      ghost.style.top = rect.top + "px";
+      ghost.style.width = rect.width + "px";
+      ghost.style.height = rect.height + "px";
+      ghost.style.transform = "none";
+      ghost.style.margin = "0";
+      ghost.style.zIndex = "9999";
+      ghost.style.pointerEvents = "none";
+      document.body.appendChild(ghost);
+
+      ghost.style.transition = "transform 0.2s ease-out";
+      requestAnimationFrame(() => {
+        ghost.style.transform = "translateY(-50px)";
+      });
 
       setTimeout(() => {
-        // Phase 2: fly to slot
-        const dx = slotRect.left + slotRect.width / 2 - rect.left - rect.width / 2;
-        const dy = slotRect.top + slotRect.height / 2 - rect.top - rect.height / 2;
-        clickedEl.style.transition = "transform 0.35s ease-in-out, opacity 0.35s ease-in-out";
-        clickedEl.style.transform = `translate(${dx}px, ${dy}px) scale(0.7)`;
-        clickedEl.style.opacity = "0.5";
+        ghost.style.transition = "transform 0.35s ease-in-out, opacity 0.35s ease-in-out";
+        ghost.style.transform = `translate(${dx}px, ${dy}px) scale(0.7)`;
+        ghost.style.opacity = "0.5";
       }, 220);
 
       setTimeout(() => {
-        clickedEl.remove();
+        ghost.remove();
       }, 600);
     }
 

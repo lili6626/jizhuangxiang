@@ -529,56 +529,56 @@ body {
 
 .draw-area {
   display: flex;
-  flex-wrap: wrap;
   justify-content: center;
-  gap: 2px;
+  align-items: flex-end;
   padding: 6px 0;
-  min-height: 120px;
+  min-height: 180px;
   flex: 1;
-  overflow: hidden;
+  overflow: visible;
 }
 
-.deck-card {
-  width: 38px;
-  height: 56px;
+.deck-fan {
+  position: relative;
+  width: 100%;
+  height: 180px;
+}
+
+.fan-card {
+  position: absolute;
+  width: 46px;
+  height: 68px;
+  left: 50%;
+  bottom: 0;
+  margin-left: -23px;
+  transform-origin: center 300px;
+  transform: rotate(var(--r));
   cursor: pointer;
-  transition: transform 0.15s ease;
-  flex-shrink: 0;
+  transition: transform 0.15s ease, filter 0.15s ease;
+  z-index: 1;
 }
 
-.deck-card.deck-card-top {
-  margin-right: 5px;
+.fan-card:hover {
+  transform: rotate(var(--r)) translateY(-32px);
+  z-index: 100;
+  filter: brightness(1.05);
 }
 
-.deck-card:not(.deck-card-top) {
-  margin-right: -18px;
-}
-
-.deck-card:hover {
-  transform: translateY(-28px);
-  z-index: 10;
-}
-
-.deck-card:active {
-  transform: translateY(-28px) scale(0.95);
-}
-
-.deck-card-inner {
+.fan-card-inner {
   width: 100%;
   height: 100%;
-  border-radius: 4px;
+  border-radius: 5px;
   background: linear-gradient(145deg, #f0f8ff, #e0f0fa);
-  border: 1px solid rgba(73, 237, 255, 0.25);
+  border: 1px solid rgba(73, 237, 255, 0.3);
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 1px 3px rgba(30, 42, 58, 0.06);
+  box-shadow: 0 2px 6px rgba(30, 42, 58, 0.08);
 }
 
-.deck-card-inner svg {
-  width: 14px;
-  height: 14px;
-  color: rgba(73, 237, 255, 0.4);
+.fan-card-inner svg {
+  width: 16px;
+  height: 16px;
+  color: rgba(73, 237, 255, 0.35);
 }
 
 .draw-slots {
@@ -1028,26 +1028,28 @@ body {
   }
 
   .draw-area {
-    gap: 3px 2px;
-    padding: 4px 2px;
+    min-height: 130px;
+    padding: 4px 0;
   }
 
-  .deck-card {
-    width: 30px;
-    height: 44px;
+  .deck-fan {
+    height: 130px;
   }
 
-  .deck-card:not(.deck-card-top) {
-    margin-right: -4px;
+  .fan-card {
+    width: 34px;
+    height: 50px;
+    margin-left: -17px;
+    transform-origin: center 220px;
   }
 
-  .deck-card.deck-card-top {
-    margin-right: 4px;
+  .fan-card:hover {
+    transform: rotate(var(--r)) translateY(-24px);
   }
 
-  .deck-card-inner svg {
-    width: 10px;
-    height: 10px;
+  .fan-card-inner svg {
+    width: 12px;
+    height: 12px;
   }
 
   .draw-slot {
