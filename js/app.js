@@ -43,6 +43,14 @@ const App = {
     return posName.replace(/选择A/g, this.decisionLabels.a).replace(/选择B/g, this.decisionLabels.b);
   },
 
+  detectQuestionType(question) {
+    const q = question.replace(/[？?！!。，,.]/g, "");
+    if (/什么时候|多久|几时|何时|多久能|什么时候能|什么时候会/.test(q)) return "timing";
+    if (/要不要|该不该|能不能|会不会|是不是|好不好|行不行|可不可以/.test(q)) return "yesno";
+    if (/还是|抉择|还是选|还是去|还是留|A好还是B好/.test(q)) return "choice";
+    return "general";
+  },
+
   init() {
     this.checkAI();
     this.showScreen("home");
@@ -641,13 +649,44 @@ ${spreadList}`
         `【${c.position.name}】位置：${c.name_zh}(${c.name_en}) ${c.is_reversed ? "逆位" : "正位"}\n关键词：${(c.is_reversed ? c.reversed_keywords : c.upright_keywords).join("、")}\n基本牌意：${c.is_reversed ? c.reversed_description : c.upright_description}`
       ).join("\n\n");
 
+      const questionType = this.detectQuestionType(question);
+      const typeInstructions = {
+        timing: `
+这是一个关于"什么时候"的时间问题。你必须在解读中给出具体的时间提示，这是最重要的部分！
+时间提示的方法：
+- 大阿尔卡那牌：每张大牌对应一个时间段（愚者=新开始=即将/近期，魔术师=1，女祭司=2，女皇=3，皇帝=4，教皇=5，恋人=6，战车=7，力量=8，隐者=9，命运之轮=转折点，正义=11，倒吊人=暂停/延迟，死神=结束=一个周期结束，节制=调和=中期，恶魔=15，塔=突变=突然，星星=希望=远期但值得等，月亮=不确定/拖延，太阳=光明=很快，审判=觉醒=季度末，世界=完成=一个周期完成）
+- 小阿尔卡那数字牌：数字本身代表时间（权杖=天，圣杯=周，宝剑=月，星币=月/季度）
+- 宫廷牌：侍从=很快（几天内），骑士=快（1-2周），王后=中等（1-3月），国王=慢（3-6月）
+- 逆位通常意味着延迟，在时间上加倍或延后
+- 综合所有牌给出一个具体时间范围，比如"大概2-3个月内"、"和数字7有关的时间点，7号、17号或7月"、"下个季度前后"
+- 不要说"需要耐心等待"这种废话，要给出可参考的时间锚点`,
+
+        yesno: `
+这是一个"是/否"判断问题。你必须在"给你的话"部分给出一个明确的倾向性答案！
+- 如果正位牌占多数且整体能量积极，倾向于"是"或"大概率可以"
+- 如果逆位牌占多数且整体能量受阻，倾向于"否"或"不太容易"
+- 如果正逆各半，给出"有希望但需要..."的条件式回答
+- 不要两边都说"也许可能"，要有明确判断
+- 格式：先给一个明确的倾向（如"倾向于可以"/"目前来看不太乐观"/"有机会，但需要你主动..."），再解释原因`,
+
+        choice: `
+这是一个二选一的决策问题。你必须在解读中明确对比两个选项，并给出推荐倾向。
+- 解读完每个选项的优劣势后，要在"给你的话"里给出明确推荐
+- 不要说"两个都可以看你自己"，要根据牌面给出"更推荐选XX，因为..."
+- 如果两个选项都不理想，也要直说"目前两个选项都不太理想，也许可以考虑..."`,
+
+        general: ``
+      };
+
+      const extraInstruction = typeInstructions[questionType] || '';
+
       aiReading = await this.callAI([
         {
           role: "system",
           content: `你是一位拥有十年经验的塔罗占卜师，风格温暖、真诚、像朋友聊天。你正在为一位来访者解读牌面。
 
 来访者的问题领域：${domainLabels[domain]}
-${this.decisionLabels ? `\n这是一个决策牌阵，选项A是"${this.decisionLabels.a}"，选项B是"${this.decisionLabels.b}"。请在解读中直接使用"${this.decisionLabels.a}"和"${this.decisionLabels.b}"代替"选择A""选择B"。` : ""}
+${this.decisionLabels ? `这是一个决策牌阵，选项A是"${this.decisionLabels.a}"，选项B是"${this.decisionLabels.b}"。请在解读中直接使用"${this.decisionLabels.a}"和"${this.decisionLabels.b}"代替"选择A""选择B"。` : ""}
 
 解读要求：
 1. 每张牌的解读必须结合它在牌阵中的位置含义。比如"过去"位置出现愚者正位，不是说愚者本身的含义，而是说过去经历中有着愚者"新开始、天真冒险"的课题
@@ -656,6 +695,9 @@ ${this.decisionLabels ? `\n这是一个决策牌阵，选项A是"${this.decision
 4. 如果问题涉及感情，给感情建议；涉及事业，给职业建议；不要所有领域用同一套话术
 5. 不要每张牌都用"这暗示着""这告诉我们"开头，换不同的表达方式
 6. "给你的话"部分要像写一封信给来访者，真诚、有温度，3-4句话
+7. 数字的解读：如果牌面数字有特殊含义（比如多张牌都含同一数字、数字递增或递减），要指出这个规律并给出解读
+
+${extraInstruction}
 
 严格用以下JSON格式回复（不要markdown代码块，不要额外文字）：
 {"cards":[{"position":"位置名","advice":"解读内容，2-3句话"},{"position":"位置名","advice":"解读内容，2-3句话"}],"summary":"给你的话，3-4句话"}`
