@@ -1027,17 +1027,22 @@ body {
     overflow: hidden;
   }
 
+  .draw-area {
+    gap: 3px 2px;
+    padding: 4px 2px;
+  }
+
   .deck-card {
     width: 30px;
     height: 44px;
   }
 
   .deck-card:not(.deck-card-top) {
-    margin-right: -12px;
+    margin-right: -4px;
   }
 
   .deck-card.deck-card-top {
-    margin-right: 3px;
+    margin-right: 4px;
   }
 
   .deck-card-inner svg {
