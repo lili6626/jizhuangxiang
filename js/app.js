@@ -359,7 +359,6 @@ ${spreadList}`
     const totalRows = Math.ceil(remaining / perRow);
     area.innerHTML = "";
 
-    let rowEl = null;
     for (let i = 0; i < remaining; i++) {
       const row = Math.floor(i / perRow);
       const col = i % perRow;
@@ -367,18 +366,12 @@ ${spreadList}`
       const isTop = col === totalInRow - 1;
       const rotation = (col - totalInRow / 2) * 1.5 + (Math.random() - 0.5) * 2;
 
-      if (col === 0) {
-        rowEl = document.createElement("div");
-        rowEl.className = "draw-area-row";
-        area.appendChild(rowEl);
-      }
-
       const card = document.createElement("div");
       card.className = "deck-card" + (isTop ? " deck-card-top" : "");
       card.dataset.deckIndex = i;
       card.innerHTML = `<div class="deck-card-inner" style="transform:rotate(${rotation}deg)">${this.cardBackSVG}</div>`;
       card.addEventListener("click", () => this.selectCard(i));
-      rowEl.appendChild(card);
+      area.appendChild(card);
     }
   },
 
@@ -394,39 +387,29 @@ ${spreadList}`
     this.availableDeck.splice(deckIndex, 1);
 
     const clickedEl = document.querySelector(`.deck-card[data-deck-index="${deckIndex}"]`);
-    if (clickedEl) {
-      const slot = document.querySelector(`.slot-card-area[data-slot="${emptyIndex}"]`);
-      if (slot) {
-        clickedEl.classList.add("card-pull-up");
-        const rect = clickedEl.getBoundingClientRect();
-        const slotRect = slot.getBoundingClientRect();
+    const slot = document.querySelector(`.slot-card-area[data-slot="${emptyIndex}"]`);
 
-        const ghost = clickedEl.cloneNode(true);
-        ghost.classList.remove("card-pull-up");
-        ghost.classList.add("card-ghost");
-        ghost.style.position = "fixed";
-        ghost.style.left = rect.left + "px";
-        ghost.style.top = rect.top + "px";
-        ghost.style.width = rect.width + "px";
-        ghost.style.height = rect.height + "px";
-        ghost.style.zIndex = "999";
-        ghost.style.pointerEvents = "none";
-        document.body.appendChild(ghost);
+    if (clickedEl && slot) {
+      const rect = clickedEl.getBoundingClientRect();
+      const slotRect = slot.getBoundingClientRect();
 
-        setTimeout(() => {
-          ghost.style.transition = "all 0.35s ease";
-          ghost.style.left = (slotRect.left + slotRect.width / 2 - rect.width / 2) + "px";
-          ghost.style.top = (slotRect.top + slotRect.height / 2 - rect.height / 2) + "px";
-          ghost.style.transform = "scale(0.85)";
-          ghost.style.opacity = "0.7";
-        }, 200);
+      // Phase 1: pull up
+      clickedEl.style.transition = "transform 0.2s ease-out, opacity 0.2s ease-out";
+      clickedEl.style.transform = "translateY(-40px)";
+      clickedEl.style.zIndex = "100";
 
-        clickedEl.style.opacity = "0";
-        setTimeout(() => {
-          clickedEl.remove();
-          ghost.remove();
-        }, 550);
-      }
+      setTimeout(() => {
+        // Phase 2: fly to slot
+        const dx = slotRect.left + slotRect.width / 2 - rect.left - rect.width / 2;
+        const dy = slotRect.top + slotRect.height / 2 - rect.top - rect.height / 2;
+        clickedEl.style.transition = "transform 0.35s ease-in-out, opacity 0.35s ease-in-out";
+        clickedEl.style.transform = `translate(${dx}px, ${dy}px) scale(0.7)`;
+        clickedEl.style.opacity = "0.5";
+      }, 220);
+
+      setTimeout(() => {
+        clickedEl.remove();
+      }, 600);
     }
 
     this.refreshDrawUI();

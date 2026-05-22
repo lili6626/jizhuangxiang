@@ -529,8 +529,8 @@ body {
 
 .draw-area {
   display: flex;
-  flex-direction: column;
-  align-items: center;
+  flex-wrap: wrap;
+  justify-content: center;
   gap: 2px;
   padding: 6px 0;
   min-height: 120px;
@@ -538,17 +538,11 @@ body {
   overflow: hidden;
 }
 
-.draw-area-row {
-  display: flex;
-  justify-content: center;
-  flex-wrap: nowrap;
-}
-
 .deck-card {
-  width: 34px;
-  height: 50px;
+  width: 38px;
+  height: 56px;
   cursor: pointer;
-  transition: transform 0.12s ease;
+  transition: transform 0.15s ease;
   flex-shrink: 0;
 }
 
@@ -557,16 +551,16 @@ body {
 }
 
 .deck-card:not(.deck-card-top) {
-  margin-right: -20px;
+  margin-right: -18px;
 }
 
 .deck-card:hover {
-  transform: translateY(-10px) scale(1.08);
+  transform: translateY(-14px) scale(1.1);
   z-index: 10;
 }
 
 .deck-card:active {
-  transform: translateY(-4px) scale(0.97);
+  transform: translateY(-6px) scale(0.97);
 }
 
 .deck-card-inner {
@@ -584,19 +578,7 @@ body {
 .deck-card-inner svg {
   width: 14px;
   height: 14px;
-}
-
-.card-pull-up {
-  animation: card-pull-up 0.2s ease-out forwards;
-}
-
-@keyframes card-pull-up {
-  0% { transform: translateY(0); }
-  100% { transform: translateY(-20px); opacity: 0.4; }
-}
-
-.card-ghost {
-  transition: all 0.32s ease;
+  color: rgba(73, 237, 255, 0.4);
 }
 
 .draw-slots {
@@ -1046,12 +1028,12 @@ body {
   }
 
   .deck-card {
-    width: 26px;
-    height: 38px;
+    width: 30px;
+    height: 44px;
   }
 
   .deck-card:not(.deck-card-top) {
-    margin-right: -14px;
+    margin-right: -12px;
   }
 
   .deck-card.deck-card-top {
