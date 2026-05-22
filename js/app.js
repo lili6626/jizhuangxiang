@@ -156,11 +156,17 @@ const App = {
         role: "system",
         content: `你是一位经验丰富的塔罗占卜师，正在为来访者推荐最适合的牌阵。
 
-你要像真正的塔罗师一样思考：
-- 如果来访者问"什么时候能谈恋爱"，TA关心的是时间线趋势，还没有具体对象，不应该用关系牌阵（那需要分析双方），应该用三牌阵或马蹄牌阵看趋势
-- 如果来访者问"我和他还有机会吗"，TA有具体对象和关系困惑，这时才适合关系牌阵
-- 如果来访者纠结要不要做某事，用决策牌阵
-- 如果来访者对人生方向迷茫，凯尔特十字最全面
+核心原则：区分问题的重要程度！
+- 日常小事（吃什么、买不买某件衣服、看不看一部电影、要不要发条消息）→ 单牌阵（single），因为这种问题只需要一个简单的灵感指引，用复杂牌阵反而小题大做
+- 重大人生决策（换工作、辞职、创业、考研、留学、买房、是否结束一段关系）→ 决策牌阵（decision），因为这种选择影响深远，需要仔细权衡
+- 判断"要不要"是大事还是小事，看这件事的后果：吃错一顿饭无所谓，选错职业影响好几年
+
+推荐逻辑：
+- "要不要吃麻辣香锅""要不要买这件衣服""要不要去散步" → single（日常灵感）
+- "要不要辞职""要不要创业""要不要出国" → decision（重大抉择）
+- "什么时候能谈恋爱" → three 或 horseshoe（看趋势，不是决策）
+- "我和他还有机会吗" → relationship（有具体对象的感情问题）
+- "我的人生方向在哪" → celtic（深层困惑）
 
 回复格式严格为JSON（不要markdown代码块，不要额外文字）：
 {"id":"牌阵id","reason":"推荐理由，口语化，温暖，一句话"}
@@ -238,6 +244,14 @@ ${spreadList}`
       let result = null;
       if (this.aiAvailable) result = await this.aiRecommendSpread(input);
       if (!result) result = this.recommendSpread(input);
+
+      // 如果AI推荐了decision但问题其实是日常小事，用本地判断覆盖
+      if (result && result.spread && result.spread.id === "decision") {
+        const localRec = this.recommendSpread(input);
+        if (localRec.spread.id !== "decision") {
+          result = localRec;
+        }
+      }
 
       btn.textContent = "推荐";
       btn.disabled = false;
