@@ -1,0 +1,1095 @@
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --aurora-blue: #49edff;
+  --aurora-blue-deep: #2bb8d4;
+  --aurora-blue-dim: #1a9bb8;
+  --aurora-green: #dafc79;
+  --aurora-green-deep: #b8d94e;
+  --aurora-purple: #7a83e9;
+  --aurora-purple-deep: #5e66c7;
+  --aurora-purple-light: rgba(122, 131, 233, 0.08);
+  --aurora-blue-light: rgba(73, 237, 255, 0.08);
+  --aurora-green-light: rgba(218, 252, 121, 0.1);
+  --bg: #f4f7fb;
+  --bg-card: #ffffff;
+  --bg-soft: #eef2f8;
+  --text-primary: #1e2a3a;
+  --text-secondary: #5a6a7e;
+  --text-dim: #94a3b8;
+  --border: rgba(30, 42, 58, 0.08);
+  --border-hover: rgba(73, 237, 255, 0.4);
+  --radius: 14px;
+  --radius-sm: 10px;
+  --shadow: 0 2px 12px rgba(30, 42, 58, 0.06);
+  --shadow-hover: 0 6px 24px rgba(73, 237, 255, 0.12);
+}
+
+html {
+  font-size: 16px;
+}
+
+body {
+  font-family: -apple-system, "Segoe UI", "Microsoft YaHei", "微软雅黑", sans-serif;
+  background: var(--bg);
+  color: var(--text-primary);
+  min-height: 100vh;
+  overflow-x: hidden;
+  background-image:
+    radial-gradient(ellipse at 80% 10%, rgba(73, 237, 255, 0.06) 0%, transparent 50%),
+    radial-gradient(ellipse at 20% 90%, rgba(122, 131, 233, 0.05) 0%, transparent 50%);
+  -webkit-font-smoothing: antialiased;
+}
+
+#app {
+  min-height: 100vh;
+  padding: 20px;
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+/* ====== Back Button ====== */
+.back-btn {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--text-secondary);
+  transition: all 0.2s;
+  box-shadow: var(--shadow);
+  margin-bottom: 10px;
+  padding: 0;
+}
+
+.back-btn:hover {
+  color: var(--aurora-blue-deep);
+  border-color: var(--border-hover);
+  box-shadow: var(--shadow-hover);
+}
+
+/* ====== Home Screen ====== */
+.home-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 32px;
+}
+
+.home-header {
+  text-align: center;
+  margin-bottom: 28px;
+}
+
+.logo {
+  font-size: 36px;
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+}
+
+.logo-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.logo-dot.blue { background: var(--aurora-blue); }
+.logo-dot.green { background: var(--aurora-green); }
+.logo-dot.purple { background: var(--aurora-purple); }
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+.logo-dot:nth-child(1) { animation: float 2.5s ease-in-out infinite; }
+.logo-dot:nth-child(2) { animation: float 2.5s ease-in-out infinite 0.3s; }
+.logo-dot:nth-child(3) { animation: float 2.5s ease-in-out infinite 0.6s; }
+
+.home-header h1 {
+  font-family: "Noto Serif SC", "Source Han Serif SC", "STSong", "SimSun", Georgia, serif;
+  font-size: 1.9rem;
+  font-weight: 600;
+  letter-spacing: 8px;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+
+.subtitle {
+  color: var(--text-secondary);
+  font-size: 0.88rem;
+  letter-spacing: 2px;
+  font-weight: 300;
+}
+
+/* ====== Recommend Section ====== */
+.recommend-section {
+  width: 100%;
+  max-width: 560px;
+  margin: 0 auto 20px;
+  text-align: center;
+}
+
+.recommend-input-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.recommend-input-row input {
+  flex: 1;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 12px 16px;
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.recommend-input-row input:focus {
+  border-color: var(--aurora-blue);
+  box-shadow: 0 0 0 3px var(--aurora-blue-light);
+}
+
+.recommend-input-row input::placeholder {
+  color: var(--text-dim);
+}
+
+.recommend-btn {
+  background: linear-gradient(135deg, var(--aurora-blue-deep), var(--aurora-blue));
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 0 24px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.3s;
+}
+
+.recommend-btn:hover {
+  box-shadow: 0 2px 12px rgba(73, 237, 255, 0.3);
+}
+
+#recommendResult {
+  margin-top: 12px;
+}
+
+.recommend-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px;
+  cursor: pointer;
+  transition: all 0.3s;
+  text-align: left;
+  animation: fade-in 0.3s ease-out;
+  box-shadow: var(--shadow);
+}
+
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.recommend-card:hover {
+  border-color: var(--aurora-blue);
+  box-shadow: var(--shadow-hover);
+}
+
+.recommend-spread {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.recommend-icon {
+  font-size: 1.5rem;
+  color: var(--aurora-purple);
+}
+
+.recommend-name {
+  font-family: "Noto Serif SC", "Source Han Serif SC", "STSong", Georgia, serif;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-right: 8px;
+}
+
+.recommend-count {
+  font-size: 0.72rem;
+  color: var(--aurora-purple-deep);
+  background: var(--aurora-purple-light);
+  padding: 2px 10px;
+  border-radius: 10px;
+}
+
+.recommend-reason {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-bottom: 8px;
+}
+
+.recommend-action {
+  font-size: 0.78rem;
+  color: var(--aurora-blue-deep);
+  letter-spacing: 1px;
+}
+
+/* ====== Spread Grid ====== */
+.spread-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  width: 100%;
+  margin-bottom: 24px;
+}
+
+.spread-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+}
+
+.spread-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--aurora-blue), var(--aurora-purple));
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.spread-card:hover {
+  border-color: var(--border-hover);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-hover);
+}
+
+.spread-card:hover::before {
+  opacity: 1;
+}
+
+.spread-icon {
+  font-size: 1.3rem;
+  color: var(--aurora-purple);
+  margin-bottom: 6px;
+}
+
+.spread-card h3 {
+  font-family: "Noto Serif SC", "Source Han Serif SC", "STSong", Georgia, serif;
+  font-size: 0.92rem;
+  font-weight: 600;
+  margin-bottom: 3px;
+}
+
+.card-count {
+  display: inline-block;
+  font-size: 0.66rem;
+  color: var(--aurora-purple-deep);
+  background: var(--aurora-purple-light);
+  padding: 1px 8px;
+  border-radius: 10px;
+  margin-bottom: 5px;
+}
+
+.spread-card p {
+  font-size: 0.74rem;
+  color: var(--text-secondary);
+  line-height: 1.45;
+}
+
+.reversal-toggle-inline {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  color: var(--text-dim);
+  font-size: 0.78rem;
+  user-select: none;
+}
+
+.reversal-toggle-inline input {
+  display: none;
+}
+
+.reversal-toggle-inline .toggle-slider {
+  width: 32px;
+  height: 18px;
+  background: var(--bg-soft);
+  border: 1px solid var(--text-dim);
+  border-radius: 9px;
+  position: relative;
+  transition: all 0.3s;
+}
+
+.reversal-toggle-inline .toggle-slider::after {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--text-dim);
+  transition: all 0.3s;
+}
+
+.reversal-toggle-inline input:checked + .toggle-slider {
+  border-color: var(--aurora-blue);
+  background: var(--aurora-blue-light);
+}
+
+.reversal-toggle-inline input:checked + .toggle-slider::after {
+  left: 16px;
+  background: var(--aurora-blue-deep);
+}
+
+/* ====== Question Screen ====== */
+.question-screen {
+  padding-top: 8px;
+}
+
+.question-content {
+  max-width: 560px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.question-content h2 {
+  font-family: "Noto Serif SC", "Source Han Serif SC", "STSong", Georgia, serif;
+  font-size: 1.4rem;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.spread-info {
+  color: var(--text-secondary);
+  font-size: 0.86rem;
+  margin-bottom: 28px;
+}
+
+.position-list {
+  text-align: left;
+  margin-bottom: 28px;
+}
+
+.position-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.position-num {
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  background: var(--aurora-blue-light);
+  color: var(--aurora-blue-deep);
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.position-name {
+  font-family: "Noto Serif SC", "Source Han Serif SC", "STSong", Georgia, serif;
+  font-weight: 600;
+  font-size: 0.86rem;
+  min-width: 72px;
+}
+
+.position-desc {
+  font-size: 0.74rem;
+  color: var(--text-secondary);
+}
+
+.question-input-area {
+  text-align: left;
+  margin-bottom: 20px;
+}
+
+.question-input-area label {
+  display: block;
+  font-size: 0.86rem;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+}
+
+.question-input-area textarea {
+  width: 100%;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 12px 16px;
+  color: var(--text-primary);
+  font-size: 1rem;
+  font-family: inherit;
+  resize: vertical;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.question-input-area textarea:focus {
+  border-color: var(--aurora-blue);
+  box-shadow: 0 0 0 3px var(--aurora-blue-light);
+}
+
+.question-input-area textarea::placeholder {
+  color: var(--text-dim);
+}
+
+.hint {
+  font-size: 0.73rem;
+  color: var(--text-dim);
+  margin-top: 6px;
+}
+
+.primary-btn {
+  background: linear-gradient(135deg, var(--aurora-blue-deep), var(--aurora-blue));
+  color: #fff;
+  border: none;
+  border-radius: var(--radius);
+  padding: 13px 36px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+  letter-spacing: 2px;
+  display: block;
+  margin: 0 auto;
+}
+
+.primary-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(73, 237, 255, 0.3);
+}
+
+.primary-btn:active {
+  transform: translateY(0);
+}
+
+/* ====== Draw Screen ====== */
+.draw-screen {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.draw-header {
+  text-align: center;
+  padding: 10px 0;
+}
+
+.draw-progress {
+  font-family: "Noto Serif SC", "Source Han Serif SC", "STSong", Georgia, serif;
+  font-size: 1.5rem;
+  color: var(--aurora-blue-deep);
+  font-weight: 300;
+  margin-bottom: 4px;
+}
+
+.draw-progress span:first-child {
+  font-weight: 700;
+}
+
+.draw-header p {
+  color: var(--text-secondary);
+  font-size: 0.84rem;
+}
+
+.draw-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 6px 0;
+  min-height: 120px;
+  flex: 1;
+  overflow: hidden;
+}
+
+.draw-area-row {
+  display: flex;
+  justify-content: center;
+  flex-wrap: nowrap;
+}
+
+.deck-card {
+  width: 34px;
+  height: 50px;
+  cursor: pointer;
+  transition: transform 0.12s ease;
+  flex-shrink: 0;
+}
+
+.deck-card.deck-card-top {
+  margin-right: 5px;
+}
+
+.deck-card:not(.deck-card-top) {
+  margin-right: -20px;
+}
+
+.deck-card:hover {
+  transform: translateY(-10px) scale(1.08);
+  z-index: 10;
+}
+
+.deck-card:active {
+  transform: translateY(-4px) scale(0.97);
+}
+
+.deck-card-inner {
+  width: 100%;
+  height: 100%;
+  border-radius: 4px;
+  background: linear-gradient(145deg, #f0f8ff, #e0f0fa);
+  border: 1px solid rgba(73, 237, 255, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 1px 3px rgba(30, 42, 58, 0.06);
+}
+
+.deck-card-inner svg {
+  width: 14px;
+  height: 14px;
+}
+
+.card-pull-up {
+  animation: card-pull-up 0.2s ease-out forwards;
+}
+
+@keyframes card-pull-up {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-20px); opacity: 0.4; }
+}
+
+.card-ghost {
+  transition: all 0.32s ease;
+}
+
+.draw-slots {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  padding: 14px 0;
+  border-top: 1px solid var(--border);
+  margin-top: auto;
+}
+
+.draw-slot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  min-width: 54px;
+}
+
+.slot-name {
+  font-family: "Noto Serif SC", "Source Han Serif SC", "STSong", Georgia, serif;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--text-dim);
+  text-align: center;
+  line-height: 1.2;
+  max-width: 64px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.draw-slot.filled .slot-name {
+  color: var(--aurora-blue-deep);
+}
+
+.slot-card-area {
+  width: 42px;
+  height: 60px;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.slot-empty {
+  width: 100%;
+  height: 100%;
+  border-radius: 5px;
+  border: 1.5px dashed rgba(30, 42, 58, 0.12);
+  background: var(--bg-card);
+}
+
+.slot-card-back {
+  width: 100%;
+  height: 100%;
+  border-radius: 5px;
+  background: linear-gradient(145deg, #f0f8ff, #e0f0fa);
+  border: 1.5px solid var(--aurora-blue);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.slot-card-back svg {
+  width: 12px;
+  height: 12px;
+}
+
+.reveal-btn {
+  display: block;
+  margin: 10px auto 0;
+}
+
+.reveal-btn.hidden {
+  display: none;
+}
+
+/* Flip for reveal */
+.slot-card-flip {
+  width: 100%;
+  height: 100%;
+  perspective: 400px;
+}
+
+.slot-card-inner {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.6s ease;
+}
+
+.slot-card-inner.flipped {
+  transform: rotateY(180deg);
+}
+
+.slot-card-back-face,
+.slot-card-front-face {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  border-radius: 5px;
+}
+
+.slot-card-back-face {
+  background: linear-gradient(145deg, #f0f8ff, #e0f0fa);
+  border: 1.5px solid var(--aurora-blue);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.slot-card-back-face svg {
+  width: 12px;
+  height: 12px;
+}
+
+.slot-card-front-face {
+  background: var(--bg-card);
+  border: 1.5px solid var(--aurora-blue);
+  transform: rotateY(180deg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  padding: 3px;
+}
+
+.slot-card-front-face.reversed {
+  transform: rotateY(180deg) rotate(180deg);
+}
+
+.scf-name {
+  font-family: "Noto Serif SC", "Source Han Serif SC", "STSong", Georgia, serif;
+  font-size: 0.5rem;
+  font-weight: 600;
+  color: var(--aurora-blue-deep);
+  text-align: center;
+  line-height: 1.15;
+}
+
+.scf-orient {
+  font-size: 0.4rem;
+  padding: 1px 4px;
+  border-radius: 4px;
+  background: var(--aurora-blue-light);
+  color: var(--aurora-blue-deep);
+}
+
+.scf-orient.rev {
+  background: rgba(122, 131, 233, 0.1);
+  color: var(--aurora-purple-deep);
+}
+
+.slot-card-front-face.reversed .scf-name,
+.slot-card-front-face.reversed .scf-orient {
+  transform: rotate(180deg);
+}
+
+.drag-ghost {
+  opacity: 0.85;
+  filter: drop-shadow(0 4px 12px rgba(73, 237, 255, 0.2));
+}
+
+.swap-target {
+  outline: 2px dashed var(--aurora-blue) !important;
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+.swap-highlight {
+  background: var(--aurora-blue-light);
+}
+
+/* ====== Reading Screen ====== */
+.reading-screen {
+  padding: 8px 0 60px;
+}
+
+.reading-header {
+  text-align: center;
+  margin-bottom: 18px;
+}
+
+.reading-header h2 {
+  font-family: "Noto Serif SC", "Source Han Serif SC", "STSong", Georgia, serif;
+  font-size: 1.2rem;
+  font-weight: 600;
+  letter-spacing: 3px;
+  color: var(--aurora-blue-deep);
+  margin-bottom: 5px;
+}
+
+.reading-domain-tag {
+  display: inline-block;
+  font-size: 0.68rem;
+  padding: 2px 10px;
+  border-radius: 8px;
+  background: var(--aurora-purple-light);
+  color: var(--aurora-purple-deep);
+  letter-spacing: 1px;
+  margin-bottom: 6px;
+}
+
+.reading-question {
+  color: var(--text-secondary);
+  font-size: 0.82rem;
+  font-style: italic;
+}
+
+.reading-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.reading-card-item {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow);
+}
+
+.reading-card-row {
+  display: flex;
+  gap: 14px;
+  padding: 14px;
+  align-items: flex-start;
+}
+
+.reading-card-visual {
+  width: 62px;
+  flex-shrink: 0;
+  text-align: center;
+  padding: 10px 0;
+  background: linear-gradient(135deg, var(--aurora-blue-light), var(--aurora-purple-light));
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(73, 237, 255, 0.2);
+}
+
+.reading-card-visual.reversed {
+  transform: rotate(180deg);
+}
+
+.rc-arcana {
+  font-size: 0.58rem;
+  color: var(--text-dim);
+  letter-spacing: 1px;
+  transform: rotate(180deg);
+}
+
+.rc-name {
+  font-family: "Noto Serif SC", "Source Han Serif SC", "STSong", Georgia, serif;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--aurora-blue-deep);
+  margin: 2px 0 1px;
+}
+
+.rc-en {
+  font-size: 0.56rem;
+  color: var(--text-dim);
+  font-style: italic;
+  transform: rotate(180deg);
+  display: block;
+}
+
+.rc-orient {
+  display: inline-block;
+  font-size: 0.6rem;
+  padding: 2px 8px;
+  border-radius: 8px;
+  margin-top: 4px;
+  background: var(--aurora-blue-light);
+  color: var(--aurora-blue-deep);
+  transform: rotate(180deg);
+}
+
+.rc-orient.rev {
+  background: rgba(122, 131, 233, 0.1);
+  color: var(--aurora-purple-deep);
+}
+
+.reading-card-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.reading-card-pos {
+  margin-bottom: 6px;
+}
+
+.pos-label {
+  font-family: "Noto Serif SC", "Source Han Serif SC", "STSong", Georgia, serif;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--aurora-blue-deep);
+  margin-right: 6px;
+}
+
+.pos-desc {
+  font-size: 0.68rem;
+  color: var(--text-dim);
+}
+
+.rc-keywords {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-bottom: 8px;
+}
+
+.keyword {
+  font-size: 0.66rem;
+  padding: 2px 7px;
+  border-radius: 7px;
+  background: var(--bg-soft);
+  color: var(--text-secondary);
+}
+
+.rc-advice {
+  font-size: 0.82rem;
+  line-height: 1.65;
+  color: var(--text-primary);
+}
+
+.reading-summary {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px 20px;
+  margin-bottom: 18px;
+  text-align: center;
+  box-shadow: var(--shadow);
+}
+
+.reading-summary h3 {
+  font-family: "Noto Serif SC", "Source Han Serif SC", "STSong", Georgia, serif;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--aurora-purple-deep);
+  margin-bottom: 8px;
+  letter-spacing: 2px;
+}
+
+.reading-summary p {
+  font-size: 0.82rem;
+  line-height: 1.7;
+  color: var(--text-secondary);
+}
+
+/* ====== Loading ====== */
+.reading-loading {
+  text-align: center;
+  padding: 60px 0;
+}
+
+.loading-spinner {
+  width: 34px;
+  height: 34px;
+  margin: 0 auto 14px;
+  border: 3px solid var(--aurora-blue-light);
+  border-top-color: var(--aurora-blue);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.reading-loading p {
+  color: var(--text-secondary);
+  font-size: 0.86rem;
+  letter-spacing: 1px;
+}
+
+/* ====== Responsive ====== */
+@media (max-width: 600px) {
+  #app {
+    padding: 12px;
+  }
+
+  .home-header {
+    margin-bottom: 18px;
+  }
+
+  .logo {
+    font-size: 30px;
+  }
+
+  .home-header h1 {
+    font-size: 1.3rem;
+    letter-spacing: 4px;
+  }
+
+  .recommend-section {
+    margin-bottom: 14px;
+  }
+
+  .recommend-input-row {
+    flex-direction: column;
+  }
+
+  .recommend-btn {
+    padding: 10px 0;
+    width: 100%;
+  }
+
+  .spread-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+
+  .spread-card {
+    padding: 12px 10px;
+  }
+
+  .spread-icon {
+    font-size: 1rem;
+    margin-bottom: 4px;
+  }
+
+  .spread-card h3 {
+    font-size: 0.82rem;
+  }
+
+  .card-count {
+    font-size: 0.6rem;
+    padding: 1px 6px;
+    margin-bottom: 3px;
+  }
+
+  .spread-card p {
+    font-size: 0.66rem;
+    line-height: 1.35;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .deck-card {
+    width: 26px;
+    height: 38px;
+  }
+
+  .deck-card:not(.deck-card-top) {
+    margin-right: -14px;
+  }
+
+  .deck-card.deck-card-top {
+    margin-right: 3px;
+  }
+
+  .deck-card-inner svg {
+    width: 10px;
+    height: 10px;
+  }
+
+  .draw-slot {
+    min-width: 42px;
+  }
+
+  .slot-card-area {
+    width: 34px;
+    height: 50px;
+  }
+
+  .reading-card-row {
+    flex-direction: column;
+    gap: 10px;
+    padding: 12px;
+  }
+
+  .reading-card-visual {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 8px;
+  }
+
+  .reading-card-visual.reversed .rc-arcana,
+  .reading-card-visual.reversed .rc-en,
+  .reading-card-visual.reversed .rc-orient {
+    transform: none;
+  }
+}
