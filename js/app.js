@@ -57,6 +57,7 @@ const App = {
     const q = question.replace(/[？?！!。，,.]/g, "");
     if (/什么时候|多久|几时|何时|多久能|什么时候能|什么时候会/.test(q)) return "timing";
     if (/要不要|该不该|能不能|会不会|是不是|好不好|行不行|可不可以/.test(q)) return "yesno";
+    if (/^能|^会|^可以|^应该|^敢|^想|^有(没有|机会|希望|可能)|.+(吗|嘛|么)$/.test(q)) return "yesno";
     if (/还是|抉择|还是选|还是去|还是留|A好还是B好/.test(q)) return "choice";
     return "general";
   },
@@ -222,8 +223,7 @@ ${spreadList}`
         <div class="spread-grid">
           ${TAROT_SPREADS.map(s => `
             <div class="spread-card" data-spread="${s.id}">
-              <div class="spread-icon">${s.icon}</div>
-              <h3>${s.name}</h3>
+              <div class="spread-card-header"><span class="spread-icon">${s.icon}</span><h3>${s.name}</h3></div>
               <span class="card-count">${s.card_count}张牌</span>
               <p>${s.description}</p>
             </div>
@@ -313,15 +313,6 @@ ${spreadList}`
         <div class="question-content">
           <h2>${spread.name}</h2>
           <p class="spread-info">${spread.card_count}张牌 · ${spread.description}</p>
-          <div class="position-list">
-            ${spread.positions.map(p => `
-              <div class="position-item">
-                <span class="position-num">${p.index + 1}</span>
-                <span class="position-name">${this.getDecisionPositionName(p.name)}</span>
-                <span class="position-desc">${p.description.replace(/选择A/g, this.decisionLabels?.a || "A").replace(/选择B/g, this.decisionLabels?.b || "B")}</span>
-              </div>
-            `).join("")}
-          </div>
           <div class="question-input-area">
             <label for="questionInput">你想问什么？</label>
             <textarea id="questionInput" placeholder="在此输入你的问题..." rows="3"></textarea>
@@ -345,6 +336,13 @@ ${spreadList}`
       this.availableDeck = [...this.reader.deck];
       this.showScreen("draw");
     });
+
+    document.getElementById("questionInput").addEventListener("keydown", (e) => {
+      if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault();
+        document.getElementById("startDraw").click();
+      }
+    });
   },
 
   renderDraw() {
@@ -357,22 +355,28 @@ ${spreadList}`
     app.innerHTML = `
       <div class="draw-screen">
         ${this.backBtn("返回")}
-        <div class="draw-header">
-          <div class="draw-progress">${filledCount} / ${spread.card_count}</div>
-          <p>凭直觉点击牌背，选择你的牌</p>
+        <button class="change-spread-btn" id="changeSpreadBtn">换牌阵</button>
+        <div class="draw-fixed-top">
+          <p class="draw-hint" id="drawHint"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>左右滑动浏览，凭直觉点选<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg></p>
+          <div class="draw-area" id="drawArea">
+            <div class="scroll-hint-side scroll-hint-left" id="scrollHintLeft"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></div>
+            <div class="scroll-hint-side scroll-hint-right" id="scrollHintRight"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg></div>
+          </div>
         </div>
-        <div class="draw-area" id="drawArea"></div>
         <div class="draw-slots" id="drawSlots">
           ${spread.positions.map((p, i) => `
             <div class="draw-slot ${this.selectedSlots[i] ? 'filled' : ''}" data-slot="${i}">
+              <span class="slot-name"><span class="slot-num">${i + 1}</span> ${this.getDecisionPositionName(p.name)}</span>
+              <span class="slot-desc">${p.description.replace(/选择A/g, this.decisionLabels?.a || "A").replace(/选择B/g, this.decisionLabels?.b || "B")}</span>
               <div class="slot-card-area" data-slot="${i}">
-                ${this.selectedSlots[i] ? `<div class="slot-card-back">${this.cardBackSVG}</div>` : '<div class="slot-empty"></div>'}
+                ${this.selectedSlots[i] ? `<div class="slot-card-back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="color:rgba(218,252,121,0.6)"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/></svg></div>` : '<div class="slot-empty"></div>'}
               </div>
-              <span class="slot-name">${this.getDecisionPositionName(p.name)}</span>
             </div>
           `).join("")}
         </div>
-        <button class="primary-btn reveal-btn ${allFilled ? '' : 'hidden'}" id="revealBtn">解读</button>
+        <div class="draw-fixed-bottom">
+          <button class="primary-btn reveal-btn ${allFilled ? '' : 'reveal-btn-disabled'}" id="revealBtn">解读</button>
+        </div>
       </div>
     `;
 
@@ -383,38 +387,59 @@ ${spreadList}`
       this.showScreen("question");
     });
 
+    document.getElementById("changeSpreadBtn")?.addEventListener("click", () => {
+      this.reader.resetDeck();
+      this.selectedSlots = [];
+      this.availableDeck = [];
+      this.showScreen("home");
+    });
+
     this.renderCardBacks();
     this.bindSlotEvents();
   },
 
   renderSlotCard() {
-    return `<div class="slot-card-back">${this.cardBackSVG}</div>`;
+    return `<div class="slot-card-back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="color:rgba(218,252,121,0.6)"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/></svg></div>`;
   },
 
   renderCardBacks() {
     const area = document.getElementById("drawArea");
     if (!area) return;
     const remaining = this.availableDeck.length;
-    area.innerHTML = "";
 
-    const fan = document.createElement("div");
-    fan.className = "deck-fan";
-
-    const maxAngle = 50;
-    const step = remaining > 1 ? (maxAngle * 2) / (remaining - 1) : 0;
-
-    for (let i = 0; i < remaining; i++) {
-      const angle = remaining > 1 ? -maxAngle + step * i : 0;
-      const card = document.createElement("div");
-      card.className = "fan-card";
-      card.dataset.deckIndex = i;
-      card.style.setProperty("--r", angle + "deg");
-      card.innerHTML = `<div class="fan-card-inner">${this.cardBackSVG}</div>`;
-      card.addEventListener("click", () => this.selectCard(i));
-      fan.appendChild(card);
+    let scroll = area.querySelector(".deck-scroll");
+    if (scroll) {
+      scroll.innerHTML = "";
+    } else {
+      scroll = document.createElement("div");
+      scroll.className = "deck-scroll";
+      area.appendChild(scroll);
     }
 
-    area.appendChild(fan);
+    for (let i = 0; i < remaining; i++) {
+      const card = document.createElement("div");
+      card.className = "scroll-card";
+      card.dataset.deckIndex = i;
+      card.innerHTML = `<div class="scroll-card-inner">${this.cardBackSVG}</div>`;
+      card.addEventListener("click", () => this.selectCard(i));
+      scroll.appendChild(card);
+    }
+
+    requestAnimationFrame(() => {
+      scroll.scrollLeft = (scroll.scrollWidth - scroll.clientWidth) / 2;
+    });
+
+    const hintLeft = document.getElementById("scrollHintLeft");
+    const hintRight = document.getElementById("scrollHintRight");
+    if (remaining <= 8) {
+      if (hintLeft) hintLeft.style.display = "none";
+      if (hintRight) hintRight.style.display = "none";
+    } else {
+      scroll.addEventListener("scroll", () => {
+        if (hintLeft) hintLeft.classList.add("scroll-hint-hidden");
+        if (hintRight) hintRight.classList.add("scroll-hint-hidden");
+      }, { once: true });
+    }
   },
 
   selectCard(deckIndex) {
@@ -428,7 +453,7 @@ ${spreadList}`
     this.selectedSlots[emptyIndex] = { card, is_reversed: card.is_reversed };
     this.availableDeck.splice(deckIndex, 1);
 
-    const clickedEl = document.querySelector(`.fan-card[data-deck-index="${deckIndex}"]`);
+    const clickedEl = document.querySelector(`.scroll-card[data-deck-index="${deckIndex}"]`);
     const slot = document.querySelector(`.slot-card-area[data-slot="${emptyIndex}"]`);
 
     if (clickedEl && slot) {
@@ -444,25 +469,20 @@ ${spreadList}`
       ghost.style.width = rect.width + "px";
       ghost.style.height = rect.height + "px";
       ghost.style.transform = "none";
-      ghost.style.margin = "0";
       ghost.style.zIndex = "9999";
       ghost.style.pointerEvents = "none";
+      ghost.style.transition = "none";
       document.body.appendChild(ghost);
 
-      ghost.style.transition = "transform 0.2s ease-out";
       requestAnimationFrame(() => {
-        ghost.style.transform = "translateY(-50px)";
+        ghost.style.transition = "transform 0.4s ease-in-out, opacity 0.4s ease-in-out";
+        ghost.style.transform = `translate(${dx}px, ${dy}px) scale(0.7)`;
+        ghost.style.opacity = "0.5";
       });
 
       setTimeout(() => {
-        ghost.style.transition = "transform 0.35s ease-in-out, opacity 0.35s ease-in-out";
-        ghost.style.transform = `translate(${dx}px, ${dy}px) scale(0.7)`;
-        ghost.style.opacity = "0.5";
-      }, 220);
-
-      setTimeout(() => {
         ghost.remove();
-      }, 600);
+      }, 450);
     }
 
     this.refreshDrawUI();
@@ -489,9 +509,6 @@ ${spreadList}`
     const filledCount = this.selectedSlots.filter(s => s !== null).length;
     const allFilled = filledCount === spread.card_count;
 
-    const progress = document.querySelector(".draw-progress");
-    if (progress) progress.textContent = `${filledCount} / ${spread.card_count}`;
-
     const slotsContainer = document.getElementById("drawSlots");
     if (slotsContainer) {
       spread.positions.forEach((p, i) => {
@@ -510,9 +527,14 @@ ${spreadList}`
 
     const revealBtn = document.getElementById("revealBtn");
     if (revealBtn) {
-      revealBtn.classList.toggle("hidden", !allFilled);
+      if (allFilled) {
+        revealBtn.classList.remove("reveal-btn-disabled");
+      } else {
+        revealBtn.classList.add("reveal-btn-disabled");
+      }
     }
 
+    this._slotsBound = false;
     this.renderCardBacks();
     this.bindSlotEvents();
   },
@@ -545,8 +567,8 @@ ${spreadList}`
 
           const rect = el.getBoundingClientRect();
           dragGhost = document.createElement("div");
-          dragGhost.className = "drag-ghost";
-          dragGhost.innerHTML = self.renderSlotCard();
+          dragGhost.className = "drag-ghost scroll-card";
+          dragGhost.innerHTML = `<div class="scroll-card-inner">${this.cardBackSVG}</div>`;
           dragGhost.style.position = "fixed";
           dragGhost.style.left = (e.clientX - 30) + "px";
           dragGhost.style.top = (e.clientY - 44) + "px";
@@ -625,6 +647,8 @@ ${spreadList}`
 
   async startReveal() {
     const spread = this.reader.currentSpread;
+    const filledCount = this.selectedSlots.filter(s => s !== null).length;
+    if (filledCount < spread.card_count) return;
     this.reader.setDrawnCards(this.selectedSlots, spread);
     this.showScreen("reading");
   },
@@ -660,7 +684,7 @@ ${spreadList}`
         <div class="reading-header">
           <h2>${spread.name} · 解读</h2>
           <span class="reading-domain-tag">${domainLabels[domain]}指引</span>
-          <p class="reading-question">${question}</p>
+          ${question !== "（未输入问题）" ? `<p class="reading-question">${question}</p>` : ""}
         </div>
         <div class="reading-loading" id="readingLoading">
           <div class="loading-spinner"></div>
@@ -671,7 +695,13 @@ ${spreadList}`
           <h3>给你的话</h3>
           <p id="summaryText"></p>
         </div>
-        <button class="primary-btn" id="restartBtn" style="display:none">重新占卜</button>
+        <div class="reading-actions" id="readingActions" style="display:none">
+          <button class="primary-btn" id="restartBtn">重新占卜</button>
+          <button class="share-btn" id="shareBtn">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+            生成分享卡
+          </button>
+        </div>
       </div>
     `;
 
@@ -686,6 +716,8 @@ ${spreadList}`
       this.reader.resetDeck();
       this.showScreen("home");
     });
+
+    document.getElementById("shareBtn")?.addEventListener("click", () => this.generateShareCard());
 
     let aiReading = null;
 
@@ -707,12 +739,14 @@ ${spreadList}`
 - 不要说"需要耐心等待"这种废话，要给出可参考的时间锚点`,
 
         yesno: `
-这是一个"是/否"判断问题。你必须在"给你的话"部分给出一个明确的倾向性答案！
-- 如果正位牌占多数且整体能量积极，倾向于"是"或"大概率可以"
-- 如果逆位牌占多数且整体能量受阻，倾向于"否"或"不太容易"
-- 如果正逆各半，给出"有希望但需要..."的条件式回答
-- 不要两边都说"也许可能"，要有明确判断
-- 格式：先给一个明确的倾向（如"倾向于可以"/"目前来看不太乐观"/"有机会，但需要你主动..."），再解释原因`,
+这是一个"是/否"判断问题。你必须给出明确的倾向性答案！这是最重要的事情！
+- 正位=能量顺畅=倾向于"可以/是"；逆位=能量受阻=倾向于"不容易/否"
+- 单牌阵时：正位=倾向于可以，逆位=倾向于不太容易
+- 多牌时：正位多=倾向于可以，逆位多=倾向于不行，各半=有条件地可以
+- 解读每张牌时必须围绕用户的问题来谈，而不是泛泛说牌意
+- 比如"能见到他吗"抽到权杖侍从正位，不要只说"权杖侍从代表探索和好奇心"，要说"权杖侍从正位带来新消息的能量，倾向于能见到——可能会收到他的消息或邀约"
+- "给你的话"第一句话必须直接回答问题，如"倾向于可以见到他"或"目前来看不太容易见到"
+- 绝对不要两边都模糊！先给明确判断，再解释原因`,
 
         choice: `
 这是一个二选一的决策问题。你必须在解读中明确对比两个选项，并给出推荐倾向。
@@ -734,13 +768,14 @@ ${spreadList}`
 ${this.decisionLabels ? `这是一个决策牌阵，选项A是"${this.decisionLabels.a}"，选项B是"${this.decisionLabels.b}"。请在解读中直接使用"${this.decisionLabels.a}"和"${this.decisionLabels.b}"代替"选择A""选择B"。` : ""}
 
 解读要求：
-1. 每张牌的解读必须结合它在牌阵中的位置含义。比如"过去"位置出现愚者正位，不是说愚者本身的含义，而是说过去经历中有着愚者"新开始、天真冒险"的课题
-2. 正位牌重点说机遇、能量和可发挥的优势；逆位牌不是说运气差，而是说能量受阻、需要调整，给出来调整方向
-3. 解读要具体、有针对性，像在跟朋友说话。不要说"你可能需要考虑沟通"这种模糊的话，要说"试着直接告诉TA你的感受，发条消息也行"
-4. 如果问题涉及感情，给感情建议；涉及事业，给职业建议；不要所有领域用同一套话术
-5. 不要每张牌都用"这暗示着""这告诉我们"开头，换不同的表达方式
-6. "给你的话"部分要像写一封信给来访者，真诚、有温度，3-4句话
-7. 数字的解读：如果牌面数字有特殊含义（比如多张牌都含同一数字、数字递增或递减），要指出这个规律并给出解读
+1. 解读必须紧紧围绕用户的具体问题，不能泛泛讲牌意。把用户的问题代入解读中
+2. 每张牌的解读必须结合它在牌阵中的位置含义。比如"过去"位置出现愚者正位，不是说愚者本身的含义，而是说过去经历中有着愚者"新开始、天真冒险"的课题
+3. 正位牌重点说机遇、能量和可发挥的优势；逆位牌不是说运气差，而是说能量受阻、需要调整，给出来调整方向
+4. 解读要具体、有针对性，像在跟朋友说话。不要说"你可能需要考虑沟通"这种模糊的话，要说"试着直接告诉TA你的感受，发条消息也行"
+5. 如果问题涉及感情，给感情建议；涉及事业，给职业建议；不要所有领域用同一套话术
+6. 不要每张牌都用"这暗示着""这告诉我们"开头，换不同的表达方式
+7. "给你的话"部分要像写一封信给来访者，真诚、有温度，3-4句话，第一句必须直接回应问题
+8. 数字的解读：如果牌面数字有特殊含义（比如多张牌都含同一数字、数字递增或递减），要指出这个规律并给出解读
 
 ${extraInstruction}
 
@@ -749,7 +784,7 @@ ${extraInstruction}
         },
         {
           role: "user",
-          content: `我的问题是：${question}\n\n牌阵：${spread.name}（${spread.card_count}张牌）\n\n抽到的牌：\n${cardsInfo}`
+          content: question !== "（未输入问题）" ? `我的问题是：${question}\n\n牌阵：${spread.name}（${spread.card_count}张牌）\n\n抽到的牌：\n${cardsInfo}` : `牌阵：${spread.name}（${spread.card_count}张牌）\n\n抽到的牌：\n${cardsInfo}`
         }
       ]);
     }
@@ -783,14 +818,15 @@ ${extraInstruction}
               <span class="rc-arcana">${card.arcana === "major" ? "大" : "小"}</span>
               <h3 class="rc-name">${card.name_zh}</h3>
               <span class="rc-en">${card.name_en}</span>
-              <span class="rc-orient ${card.is_reversed ? "rev" : ""}">${card.is_reversed ? "逆位" : "正位"}</span>
             </div>
             <div class="reading-card-body">
               <div class="reading-card-pos">
                 <span class="pos-label">${displayName}</span>
+                <span class="rc-orient ${card.is_reversed ? "rev" : ""}">${card.is_reversed ? "逆位" : "正位"}</span>
                 <span class="pos-desc">${displayDesc}</span>
               </div>
               <div class="rc-keywords">
+                <span class="keyword-label">牌面关键词</span>
                 ${(card.is_reversed ? card.reversed_keywords : card.upright_keywords).map(k => `<span class="keyword">${k}</span>`).join("")}
               </div>
               <p class="rc-advice">${advice}</p>
@@ -806,7 +842,7 @@ ${extraInstruction}
     loading.style.display = "none";
     cardsEl.style.display = "flex";
     summaryEl.style.display = "block";
-    restartBtn.style.display = "block";
+    document.getElementById("readingActions").style.display = "flex";
 
     this.animateReadingCards();
   } catch (err) {
@@ -839,6 +875,59 @@ ${extraInstruction}
         item.style.transform = "translateY(0)";
       }, i * 150);
     });
+  },
+
+  async generateShareCard() {
+    const reading = this.reader.getReading();
+    if (!reading) return;
+
+    const btn = document.getElementById("shareBtn");
+    btn.disabled = true;
+    btn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="animation:spin 1s linear infinite"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg> 生成中...`;
+
+    try {
+      const blob = await ShareCardGenerator.generate(reading, {
+        decisionLabels: this.decisionLabels,
+        date: new Date().toLocaleDateString("zh-CN").replace(/\//g, "."),
+      });
+
+      const isWeChat = /MicroMessenger/i.test(navigator.userAgent);
+      const file = new File([blob], "tarot-reading.png", { type: "image/png" });
+
+      if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+        try {
+          await navigator.share({ files: [file], title: "塔罗占卜结果" });
+          return;
+        } catch (err) {
+          if (err.name === "AbortError") return;
+        }
+      }
+
+      if (isWeChat) {
+        const url = URL.createObjectURL(blob);
+        const overlay = document.createElement("div");
+        overlay.className = "share-overlay";
+        overlay.innerHTML = `<div class="share-overlay-inner"><img src="${url}" /><p>长按图片保存到手机</p><button class="share-overlay-close">关闭</button></div>`;
+        document.body.appendChild(overlay);
+        overlay.querySelector(".share-overlay-close").addEventListener("click", () => {
+          overlay.remove(); URL.revokeObjectURL(url);
+        });
+        return;
+      }
+
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url; a.download = "tarot-reading.png";
+      document.body.appendChild(a); a.click();
+      document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    } catch (err) {
+      console.error("Share card generation failed:", err);
+      this.showToast("生成失败，请重试");
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg> 生成分享卡`;
+    }
   }
 };
 

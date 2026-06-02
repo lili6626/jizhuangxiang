@@ -4,15 +4,15 @@ export async function onRequestPost(context) {
 
   try {
     const response = await fetch(
-      "https://ark.cn-beijing.volces.com/api/v3/chat/completions",
+      "https://kspmas.ksyun.com/v1/chat/completions",
       {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${env.ARK_API_KEY}`,
+          Authorization: `Bearer ${env.KSC_API_KEY}`,
         },
         body: JSON.stringify({
-          model: "doubao-1-5-pro-32k-250115",
+          model: "deepseek-v3.2",
           messages,
           temperature: 0.8,
           max_tokens: 2000,
