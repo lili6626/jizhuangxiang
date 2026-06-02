@@ -527,10 +527,10 @@ body {
 
 .deck-scroll {
   display: flex;
-  gap: 10px;
+  gap: 0;
   overflow-x: auto;
   overflow-y: hidden;
-  padding: 16px 40px;
+  padding: 16px 24px;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
 }
@@ -563,17 +563,31 @@ body {
   flex-shrink: 0;
   width: 56px;
   height: 80px;
+  margin-right: -14px;
   cursor: pointer;
-  transition: transform 0.18s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.18s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease;
+  opacity: 0;
+  transform: translateY(30px) scale(0.7);
+}
+
+.scroll-card.dealt {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.scroll-card:last-child {
+  margin-right: 0;
 }
 
 .scroll-card:hover {
-  transform: translateY(-18px);
+  transform: translateY(-18px) scale(1.05);
   z-index: 10;
+  margin-right: -4px;
+  margin-left: 10px;
 }
 
 .scroll-card:active {
-  transform: translateY(-10px) scale(0.96);
+  transform: translateY(-10px) scale(0.98);
   transition-duration: 0.1s;
 }
 
@@ -1169,15 +1183,16 @@ body {
   .scroll-card {
     width: 44px;
     height: 64px;
+    margin-right: -12px;
   }
 
   .deck-scroll {
-    gap: 8px;
-    padding: 8px 24px;
+    gap: 0;
+    padding: 8px 16px;
   }
 
   .scroll-card:hover {
-    transform: translateY(-12px);
+    transform: translateY(-12px) scale(1.05);
   }
 
   .scroll-card-inner svg {

@@ -402,7 +402,7 @@ ${spreadList}`
     return `<div class="slot-card-back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="color:rgba(218,252,121,0.6)"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/></svg></div>`;
   },
 
-  renderCardBacks() {
+  renderCardBacks(animate = true) {
     const area = document.getElementById("drawArea");
     if (!area) return;
     const remaining = this.availableDeck.length;
@@ -416,18 +416,32 @@ ${spreadList}`
       area.appendChild(scroll);
     }
 
+    const cards = [];
     for (let i = 0; i < remaining; i++) {
       const card = document.createElement("div");
-      card.className = "scroll-card";
+      card.className = "scroll-card" + (animate ? "" : " dealt");
       card.dataset.deckIndex = i;
       card.innerHTML = `<div class="scroll-card-inner">${this.cardBackSVG}</div>`;
       card.addEventListener("click", () => this.selectCard(i));
       scroll.appendChild(card);
+      cards.push(card);
     }
 
     requestAnimationFrame(() => {
       scroll.scrollLeft = (scroll.scrollWidth - scroll.clientWidth) / 2;
     });
+
+    // Deal animation: cards fly in with stagger
+    if (animate && cards.length > 0) {
+      const batchSize = 5;
+      const stagger = 40;
+      for (let i = 0; i < cards.length; i++) {
+        const delay = Math.floor(i / batchSize) * stagger + (i % batchSize) * (stagger / batchSize * 0.5);
+        setTimeout(() => {
+          if (cards[i]) cards[i].classList.add("dealt");
+        }, 150 + delay);
+      }
+    }
 
     const hintLeft = document.getElementById("scrollHintLeft");
     const hintRight = document.getElementById("scrollHintRight");
@@ -535,7 +549,7 @@ ${spreadList}`
     }
 
     this._slotsBound = false;
-    this.renderCardBacks();
+    this.renderCardBacks(false);
     this.bindSlotEvents();
   },
 
