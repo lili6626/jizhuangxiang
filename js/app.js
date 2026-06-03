@@ -905,36 +905,41 @@ ${extraInstruction}
         date: new Date().toLocaleDateString("zh-CN").replace(/\//g, "."),
       });
 
-      const isWeChat = /MicroMessenger/i.test(navigator.userAgent);
-      const file = new File([blob], "tarot-reading.png", { type: "image/png" });
-
-      if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
-        try {
-          await navigator.share({ files: [file], title: "塔罗占卜结果" });
-          return;
-        } catch (err) {
-          if (err.name === "AbortError") return;
-        }
-      }
-
-      if (isWeChat) {
-        const url = URL.createObjectURL(blob);
-        const overlay = document.createElement("div");
-        overlay.className = "share-overlay";
-        overlay.innerHTML = `<div class="share-overlay-inner"><img src="${url}" /><p>长按图片保存到手机</p><button class="share-overlay-close">关闭</button></div>`;
-        document.body.appendChild(overlay);
-        overlay.querySelector(".share-overlay-close").addEventListener("click", () => {
-          overlay.remove(); URL.revokeObjectURL(url);
-        });
-        return;
-      }
-
       const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url; a.download = "tarot-reading.png";
-      document.body.appendChild(a); a.click();
-      document.body.removeChild(a);
-      setTimeout(() => URL.revokeObjectURL(url), 1000);
+      const file = new File([blob], "tarot-reading.png", { type: "image/png" });
+      const canShare = navigator.share && navigator.canShare && navigator.canShare({ files: [file] });
+
+      const overlay = document.createElement("div");
+      overlay.className = "share-overlay";
+      overlay.innerHTML = `
+        <div class="share-overlay-inner">
+          <img src="${url}" />
+          <div class="share-overlay-actions">
+            <button class="share-overlay-btn share-overlay-save">保存图片</button>
+            ${canShare ? '<button class="share-overlay-btn share-overlay-share">分享</button>' : '<p class="share-overlay-hint">长按图片保存到手机</p>'}
+          </div>
+          <button class="share-overlay-close">关闭</button>
+        </div>`;
+      document.body.appendChild(overlay);
+
+      overlay.querySelector(".share-overlay-save").addEventListener("click", () => {
+        const a = document.createElement("a");
+        a.href = url; a.download = "tarot-reading.png";
+        document.body.appendChild(a); a.click();
+        document.body.removeChild(a);
+      });
+
+      const shareBtn = overlay.querySelector(".share-overlay-share");
+      if (shareBtn) {
+        shareBtn.addEventListener("click", async () => {
+          try { await navigator.share({ files: [file], title: "塔罗占卜结果" }); } catch (e) { if (e.name !== "AbortError") console.error(e); }
+        });
+      }
+
+      overlay.querySelector(".share-overlay-close").addEventListener("click", () => {
+        overlay.remove(); URL.revokeObjectURL(url);
+      });
+
     } catch (err) {
       console.error("Share card generation failed:", err);
       this.showToast("生成失败，请重试");
