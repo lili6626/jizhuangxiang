@@ -836,7 +836,7 @@ ${extraInstruction}
             <div class="reading-card-body">
               <div class="reading-card-pos">
                 <span class="pos-label">${displayName}</span>
-                <span class="rc-orient ${card.is_reversed ? "rev" : ""}">${card.is_reversed ? "逆位" : "正位"}</span>
+                <span class="rc-orient ${card.is_reversed ? "reversed" : "upright"}">${card.is_reversed ? "逆位" : "正位"}</span>
                 <span class="pos-desc">${displayDesc}</span>
               </div>
               <div class="rc-keywords">
